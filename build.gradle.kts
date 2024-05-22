@@ -43,8 +43,14 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.h2database:h2")
+	// kotest
 	testImplementation("io.kotest:kotest-runner-junit5:5.9.0")
+	implementation("io.kotest:kotest-extensions-spring:4.4.3")
+	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
+
+	// mockk
 	testImplementation("io.mockk:mockk:1.13.11")
+
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
