@@ -1,5 +1,9 @@
 package com.example.testcode.global.security
 
+import com.example.testcode.global.filter.CustomLoginFailHandler
+import com.example.testcode.global.filter.CustomLoginSuccessHandler
+import com.example.testcode.global.filter.CustomUserDetailsService
+import com.example.testcode.global.filter.CustomUsernamePasswordAuthenticationFilter
 import com.example.testcode.logger
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
@@ -13,12 +17,16 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.SecurityFilterChain
 import jakarta.servlet.Filter
 import org.springframework.context.annotation.Bean
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.ProviderManager
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.context.SecurityContextHolderFilter
 
 @Configuration
-class SecurityConfig {
+class SecurityConfig(private val customUserDetailsService: CustomUserDetailsService) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -42,13 +50,42 @@ class SecurityConfig {
         }
 
         http.addFilterBefore(LoggingFilter(), SecurityContextHolderFilter::class.java)
-
+        http.addFilterBefore(customUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
 
     @Bean
     fun bcryptPasswordEncoder() : PasswordEncoder {
         return BCryptPasswordEncoder()
+    }
+
+    @Bean
+    fun customUsernamePasswordAuthenticationFilter() : CustomUsernamePasswordAuthenticationFilter {
+        CustomUsernamePasswordAuthenticationFilter().apply {
+            setAuthenticationSuccessHandler(CustomLoginSuccessHandler())
+            setAuthenticationFailureHandler(customLoginFailHandler())
+            setAuthenticationManager(authenticationManager())
+            return this
+        }
+    }
+
+    @Bean
+    fun authenticationManager() : AuthenticationManager {
+        DaoAuthenticationProvider().apply {
+            setPasswordEncoder(bcryptPasswordEncoder())
+            setUserDetailsService(customUserDetailsService)
+            return ProviderManager(this)
+        }
+    }
+
+    @Bean
+    fun customLoginFailHandler() : CustomLoginFailHandler {
+        return CustomLoginFailHandler()
+    }
+
+    @Bean
+    fun customLoginSuccessHandler() : CustomLoginSuccessHandler {
+        return CustomLoginSuccessHandler()
     }
 
 
