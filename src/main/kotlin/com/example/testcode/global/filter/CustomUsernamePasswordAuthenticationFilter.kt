@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import java.util.*
 
 
-const val DEFAULT_LOGIN_REQUEST_URL = "/api/v1/login"
+const val DEFAULT_LOGIN_REQUEST_URL = "/api/v1/users/login"
 const val AUTHORIZATION_HEADER = "Authorization"
 const val BASIC_AUTHORIZATION_PREFIX = "Basic "
 
