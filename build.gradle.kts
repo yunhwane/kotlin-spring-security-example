@@ -43,6 +43,9 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.h2database:h2")
+
+	// security
+	implementation("org.springframework.boot:spring-boot-starter-security")
 	// kotest
 	testImplementation("io.kotest:kotest-runner-junit5:5.9.0")
 	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
