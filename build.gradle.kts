@@ -49,6 +49,7 @@ dependencies {
 	// kotest
 	testImplementation("io.kotest:kotest-runner-junit5:5.9.0")
 	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
+	testImplementation("io.rest-assured:rest-assured:5.3.2")
 
 	// mockk
 	testImplementation("io.mockk:mockk:1.13.11")

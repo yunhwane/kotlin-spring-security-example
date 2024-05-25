@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.SecurityFilterChain
 import jakarta.servlet.Filter
 import org.springframework.context.annotation.Bean
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.context.SecurityContextHolderFilter
 
 @Configuration
@@ -24,7 +26,6 @@ class SecurityConfig {
             it.disable()
         }
         http.authorizeHttpRequests {
-            it.requestMatchers("/api/v1/users/**").authenticated()
             it.anyRequest().permitAll()
         }
 
@@ -45,34 +46,39 @@ class SecurityConfig {
         return http.build()
     }
 
+    @Bean
+    fun bcryptPasswordEncoder() : PasswordEncoder {
+        return BCryptPasswordEncoder()
+    }
+
+
     class LoggingFilter : Filter {
 
         override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
-
             val req = request as HttpServletRequest
             val res = response as HttpServletResponse
 
-            // 현재 사용자 정보 가져오기
             val authentication = SecurityContextHolder.getContext().authentication
-
-            // 사용자 정보가 있다면 로그에 포함시키기
             val userInfo = if (authentication != null && authentication.isAuthenticated) {
                 "User: ${authentication.name}, Roles: ${authentication.authorities.joinToString(", ")}"
             } else {
                 "Anonymous User"
             }
 
-
             val path = req.requestURI
             val method = req.method
-
             val startTime = System.currentTimeMillis()
-            chain?.doFilter(request, response)
-            val endTime = System.currentTimeMillis()
 
-            val log = "[${method}] ${path} (${endTime - startTime}ms), $userInfo"
-
-            logger().info(log)
+            try {
+                chain?.doFilter(request, response)
+                val endTime = System.currentTimeMillis()
+                val duration = endTime - startTime
+                logger().info("[$method] $path ($duration ms), $userInfo")
+            } catch (e: Exception) {
+                val endTime = System.currentTimeMillis()
+                val duration = endTime - startTime
+                logger().error("[$method] $path ($duration ms), $userInfo - Failed with exception: ${e.message}", e)
+            }
         }
     }
 }
