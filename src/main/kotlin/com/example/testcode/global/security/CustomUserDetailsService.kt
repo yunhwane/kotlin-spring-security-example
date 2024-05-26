@@ -1,9 +1,7 @@
-package com.example.testcode.global.filter
+package com.example.testcode.global.security
 
 import com.example.testcode.user.core.domain.User
 import com.example.testcode.user.core.port.UserJpaPort
-import com.example.testcode.user.infrastucture.persistence.UserModel
-import com.example.testcode.user.infrastucture.repository.UserJpaRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
