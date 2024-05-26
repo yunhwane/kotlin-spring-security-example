@@ -1,4 +1,4 @@
-package com.example.testcode.global.filter
+package com.example.testcode.global.security
 
 import com.example.testcode.user.core.domain.User
 import com.example.testcode.user.infrastucture.persistence.UserModel

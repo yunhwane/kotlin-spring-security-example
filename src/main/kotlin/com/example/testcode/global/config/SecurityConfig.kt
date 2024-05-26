@@ -1,9 +1,11 @@
-package com.example.testcode.global.security
+package com.example.testcode.global.config
 
-import com.example.testcode.global.filter.CustomLoginFailHandler
-import com.example.testcode.global.filter.CustomLoginSuccessHandler
-import com.example.testcode.global.filter.CustomUserDetailsService
+import com.example.testcode.global.handler.CustomLoginFailHandler
+import com.example.testcode.global.handler.CustomLoginSuccessHandler
 import com.example.testcode.global.filter.CustomUsernamePasswordAuthenticationFilter
+import com.example.testcode.global.filter.JwtAuthenticationProcessingFilter
+import com.example.testcode.global.security.CustomUserDetailsService
+import com.example.testcode.jwt.JwtGateway
 import com.example.testcode.logger
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
@@ -26,7 +28,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.context.SecurityContextHolderFilter
 
 @Configuration
-class SecurityConfig(private val customUserDetailsService: CustomUserDetailsService) {
+class SecurityConfig(private val customUserDetailsService: CustomUserDetailsService, private val jwtGateway: JwtGateway) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -51,6 +53,8 @@ class SecurityConfig(private val customUserDetailsService: CustomUserDetailsServ
 
         http.addFilterBefore(LoggingFilter(), SecurityContextHolderFilter::class.java)
         http.addFilterBefore(customUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
+        http.addFilterBefore(jwtAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter::class.java)
+
         return http.build()
     }
 
@@ -60,9 +64,14 @@ class SecurityConfig(private val customUserDetailsService: CustomUserDetailsServ
     }
 
     @Bean
+    fun jwtAuthenticationProcessingFilter() : JwtAuthenticationProcessingFilter {
+        return JwtAuthenticationProcessingFilter(jwtGateway)
+    }
+
+    @Bean
     fun customUsernamePasswordAuthenticationFilter() : CustomUsernamePasswordAuthenticationFilter {
         CustomUsernamePasswordAuthenticationFilter().apply {
-            setAuthenticationSuccessHandler(CustomLoginSuccessHandler())
+            setAuthenticationSuccessHandler(customLoginSuccessHandler())
             setAuthenticationFailureHandler(customLoginFailHandler())
             setAuthenticationManager(authenticationManager())
             return this
@@ -85,7 +94,7 @@ class SecurityConfig(private val customUserDetailsService: CustomUserDetailsServ
 
     @Bean
     fun customLoginSuccessHandler() : CustomLoginSuccessHandler {
-        return CustomLoginSuccessHandler()
+        return CustomLoginSuccessHandler(jwtGateway)
     }
 
 
