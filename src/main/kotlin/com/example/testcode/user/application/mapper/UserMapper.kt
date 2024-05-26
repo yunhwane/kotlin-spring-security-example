@@ -1,5 +1,6 @@
 package com.example.testcode.user.application.mapper
 
+import com.example.testcode.user.application.api.UserInfoResponse
 import com.example.testcode.user.application.api.UserRequest
 import com.example.testcode.user.application.api.UserSaveResponse
 import com.example.testcode.user.core.domain.User
@@ -20,5 +21,9 @@ object UserMapper {
 
     fun toUserSaveResponse(user: User): UserSaveResponse {
          return UserSaveResponse(user.id!!, user.email, user.name)
+    }
+
+    fun toUserInfoResponse(user: User): UserInfoResponse {
+        return UserInfoResponse(user.id!!, user.email, user.name)
     }
 }
