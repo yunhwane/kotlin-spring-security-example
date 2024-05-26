@@ -26,6 +26,12 @@ class UserRepositoryTest(val userJpaRepository: UserJpaRepository): ShouldSpec({
             findShouldBe(foundUserModel)
         }
     }
+    context("userId로 유저를 조회한다") {
+        should("userId로 유저를 조회한다") {
+            val foundUserModel = userJpaRepository.findUserModelById(1L)
+            findShouldBe(foundUserModel)
+        }
+    }
 })
 {
     companion object{

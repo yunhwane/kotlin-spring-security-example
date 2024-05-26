@@ -19,4 +19,9 @@ class UserJpaAdapter(private val userJpaRepository: UserJpaRepository): UserJpaP
         val userModel = userJpaRepository.findByEmail(email)
         return userModel?.let { UserMapper.toUserFromUserModel(it) }
     }
+
+    override fun findById(id: Long): User? {
+        val userModel = userJpaRepository.findUserModelById(id)
+        return userModel?.let { UserMapper.toUserFromUserModel(it) }
+    }
 }

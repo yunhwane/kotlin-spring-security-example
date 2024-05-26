@@ -8,14 +8,18 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class UserService(private val userJpaPort: UserJpaPort, private val passwordEncoder: PasswordEncoder): UserSaveUseCase {
+class UserSaveService(private val userJpaPort: UserJpaPort, private val passwordEncoder: PasswordEncoder): UserSaveUseCase {
 
     @Transactional
     override fun execute(user: User): User {
+        duplicateEmailCheck(user)
+        user.encodePassword(passwordEncoder)
+        return userJpaPort.save(user)
+    }
+
+    private fun duplicateEmailCheck(user: User) {
         userJpaPort.findByEmail(user.email)?.let {
             throw IllegalArgumentException("이미 존재하는 이메일입니다.")
         }
-        user.encodePassword(passwordEncoder)
-        return userJpaPort.save(user)
     }
 }

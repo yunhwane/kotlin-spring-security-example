@@ -2,7 +2,7 @@ package com.example.testcode.user
 
 import com.example.testcode.user.application.api.UserRequest
 import com.example.testcode.user.application.mapper.UserMapper
-import com.example.testcode.user.application.service.UserService
+import com.example.testcode.user.application.service.UserSaveService
 import com.example.testcode.user.core.domain.User
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
@@ -13,7 +13,7 @@ import io.mockk.mockk
 import io.mockk.verify
 
 class UserServiceTest: DescribeSpec({
-    val userService: UserService = mockk()
+    val userSaveService: UserSaveService = mockk()
 
     describe("유저 서비스 테스트") {
         context("회원 등록 서비스 성공 케이스") {
@@ -22,12 +22,12 @@ class UserServiceTest: DescribeSpec({
                 val user = UserMapper.toUser(request)
                 val savedUser = createSaveStubUser()
 
-                every { userService.execute(user) } returns savedUser
-                val result = userService.execute(user)
+                every { userSaveService.execute(user) } returns savedUser
+                val result = userSaveService.execute(user)
                 result shouldBe savedUser
 
                 // Verify that saveUser was called exactly once
-                verify(exactly = 1) { userService.execute(user) }
+                verify(exactly = 1) { userSaveService.execute(user) }
             }
         }
         context("회원 등록 서비스 실패 케이스") {
@@ -35,15 +35,15 @@ class UserServiceTest: DescribeSpec({
                 val request = createSaveStubRequest()
                 val user = UserMapper.toUser(request)
 
-                every { userService.execute(user) } throws IllegalArgumentException("이미 존재하는 이메일입니다.")
+                every { userSaveService.execute(user) } throws IllegalArgumentException("이미 존재하는 이메일입니다.")
 
                 // Method call and exception assertion
                 shouldThrow<IllegalArgumentException> {
-                    userService.execute(user)
+                    userSaveService.execute(user)
                 }.message shouldBe "이미 존재하는 이메일입니다."
 
                 // Verify that saveUser was called exactly once
-                verify(exactly = 1) { userService.execute(user) }
+                verify(exactly = 1) { userSaveService.execute(user) }
             }
         }
     }
