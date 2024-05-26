@@ -28,22 +28,24 @@ class JwtAuthenticationProcessingFilter(private val jwtGateway: JwtGateway): Onc
             return
         }
 
-        if(verifyAccessToken(request)) {
-            filterChain.doFilter(request, response)
-            return
-        }
+        verifyAccessToken(request, response, filterChain)
     }
 
-    private fun verifyAccessToken(request: HttpServletRequest): Boolean {
+    private fun verifyAccessToken(request: HttpServletRequest,response: HttpServletResponse, filterChain: FilterChain) {
         val token = jwtGateway.extractAccessToken(request)
 
         if(jwtGateway.verifyToken(token)) {
             val user: User = jwtGateway.getClaimToUserDomain(token)
             saveAuthentication(user)
-            return true
+            filterChain.doFilter(request, response)
+            return
         }
 
-        return false
+        response.status = HttpServletResponse.SC_UNAUTHORIZED
+        response.contentType = "application/json"
+        response.writer.write("{\"error\":\"Unauthorized\", \"message\":\"Invalid or missing JWT token\"}")
+        response.writer.flush()
+        return
     }
 
     private fun saveAuthentication(user: User) {

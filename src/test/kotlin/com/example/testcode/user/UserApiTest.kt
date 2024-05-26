@@ -46,7 +46,7 @@ class UserApiTest: ApiTest(){
                     response.body().jsonPath().getString("name") shouldBe "name"
                 }
             }
-            context("사용자가 유저 정보 조회 api를 호출한다.") {
+            context("사용자 정보 조회 실패") {
                 it("유저 정보 조회 실패 - 401 반환") {
                     val response = UserLoadSteps.유저조회요청_401_토큰없음()
                     response.statusCode() shouldBe 401
